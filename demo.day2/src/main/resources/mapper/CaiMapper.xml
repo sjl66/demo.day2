@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.bawei.dao.CaiDao">
+	
+	<resultMap type="Cai" id="caiMap">
+		<id property="cid" column="cid" />
+		<result property="name" column="name" />
+		<result property="price" column="price" />
+		<collection property="liao" ofType="Liao"
+			select="com.bawei.dao.CaiDao.findByidLiao" column="cid"></collection>
+	</resultMap>
+	
+	<select id="list" resultMap="caiMap">
+		select * from Cai 
+		<if test="mohu!=null and mohu!=''">
+			where name like '%${mohu}%'
+		</if>
+	</select>
+	
+	<select id="findByidLiao" resultType="Liao">
+		select * from Liao left join zhu on liao.lid=zhu.lid where zhu.cid=#{id}
+	</select>
+
+	<select id="liaos" resultType="Liao">
+		select * from liao
+	</select>
+
+	<insert id="addcai" useGeneratedKeys="true" keyProperty="cid">
+		INSERT INTO `cai` VALUES (null,#{name},#{price});
+	</insert>
+
+	<insert id="addzhu">
+		INSERT INTO `zhu` VALUES
+		<foreach collection="lids" item="a" separator=",">
+			(#{cid},#{a})
+		</foreach>
+
+	</insert>
+
+	<select id="Byid" resultType="Cai">
+		select * from Cai where cid=#{id}
+	</select>
+
+	<update id="caiUpdate">
+		UPDATE `cai` SET `name`=#{name}, `price`=#{price} WHERE (`cid`=#{cid});
+	</update>
+
+	<delete id="delzhu">
+		delete from zhu where cid=#{cid}
+	</delete>
+
+	<delete id="dels">
+		delete from cai where cid in (${value})
+	</delete>
+
+	<delete id="delszhu">
+		delete from zhu where cid in (${value})
+	</delete>
+
+	<select id="look" resultMap="caiMap">
+		select * from cai where cid=#{id};
+	</select>
+
+
+</mapper>
